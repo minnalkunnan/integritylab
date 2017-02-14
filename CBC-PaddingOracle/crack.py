@@ -46,21 +46,22 @@ def checkValidPadding():
 	cipherText = '57a2b3801521051afd045182a11e7ac3689beed332666eba4efdd540b9d316ba214bc4a5ecb25394265a45b70cca5dc4'
 	aCT = hex_to_ascii(cipherText)
 	ourCipherText = os.urandom(48)
-	IS = [0] * 16
+	IS = ['\0'] * 16
 	
 	firstCT = ourCipherText[0:len(ourCipherText) - 16]
    #ourCipherText[len(ourCipherText) - 16:len(ourCipherText)]
    errCode = 403
+   
    curTry = -1
 	for i in range (15, -1, -1):
 	   curPad = 16 - i
-	   block = os.urandom(16)
+	   block = list(os.urandom(16))
 	   for j in range(15, i, -1):
-	      block[j] = chr((16 - i) ^ ord(IS[j]))
+	      block = chr((16 - i) ^ ord(IS[j]))
 	   while errCode != 404:
 	      curTry += 1
 	      block[i] = chr(curTry)
-	      r = requests.post("http://localhost:8080/?enc=" + firstCT + block)
+	      #r = requests.post("http://localhost:8080/?enc=" + firstCT + block)
 	   IS[i] = chr(curPad ^ ord(block[i]))
 	 
 	#guess = cipherText + ourCipherText
