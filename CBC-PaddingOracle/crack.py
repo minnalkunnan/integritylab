@@ -43,7 +43,7 @@ def XOR_text_key ( text , key ):
    return new_text
    
 def checkValidPadding():
-   cipherText = '57a2b3801521051afd045182a11e7ac3689beed332666eba4efdd540b9d316ba214bc4a5ecb25394265a45b70cca5dc4'
+   cipherText = 'b90cfd37bdbda3237fa83800d67f19c03edf1ef11527aa045167dd6adaab50894d65b7dfe2d30c065f47a259a4c1c81d'
    aCT = hex_to_ascii(cipherText)
    ourCipherText = os.urandom(48)
    IS = ['\0'] * 16
@@ -76,4 +76,4 @@ def checkValidPadding():
 
    print(ascii_to_hex("".join(IS)))
 
-checkValidPadding()
+print(XOR_text_key(hex_to_ascii('6a893e9c7a4ac7657d47944db7c63188'), hex_to_ascii('3edf1ef11527aa045167dd6adaab5089')))
