@@ -44,36 +44,42 @@ def XOR_text_key ( text , key ):
    
 def checkValidPadding():
    cipherText = 'b90cfd37bdbda3237fa83800d67f19c03edf1ef11527aa045167dd6adaab50894d65b7dfe2d30c065f47a259a4c1c81d'
+   plainText = ""
    aCT = hex_to_ascii(cipherText)
    ourCipherText = os.urandom(48)
-   IS = ['\0'] * 16
+   
    #firstCT = ourCipherText[0:len(ourCipherText) - 16]
-   firstCT = aCT[0:16]
-   lastCT = aCT[32:48]
+   
    #ourCipherText[len(ourCipherText) - 16:len(ourCipherText)]
    errCode = 403
    
    curTry = -1
    
-   for i in range (15, -1, -1):
-      curPad = 16 - i
-      block = list(os.urandom(16))
+   for b in range (len(aCT) / 16 - 2, -1, -1):
+      firstCT = aCT[0:(i*16)]
+      lastCT = aCT[(i*16) + 16:(i*16) + 32]
+      IS = ['\0'] * 16
       
-      for j in range(15, i, -1):
-	      block[j] = chr(curPad ^ ord(IS[j]))
+      for i in range (15, -1, -1):
+         curPad = 16 - i
+         block = list(os.urandom(16))
          
-      print(block)
-
-      while errCode != '404':
-            curTry += 1
-            block[i] = chr(curTry)
-            r = requests.get("http://localhost:8080/?enc=" + ascii_to_hex(firstCT) + ascii_to_hex("".join(block)) + ascii_to_hex(lastCT))
-            errCode = str(r).split("[")[1].split("]")[0].strip("\n")
+         for j in range(15, i, -1):
+	         block[j] = chr(curPad ^ ord(IS[j]))
             
-      IS[i] = chr(curPad ^ ord(block[i]))
-      errCode = '403'
-      curTry = -1
+         print(block)
 
-   print(ascii_to_hex("".join(IS)))
+         while errCode != '404':
+               curTry += 1
+               block[i] = chr(curTry)
+               r = requests.get("http://localhost:8080/?enc=" + ascii_to_hex(firstCT) + ascii_to_hex("".join(block)) + ascii_to_hex(lastCT))
+               errCode = str(r).split("[")[1].split("]")[0].strip("\n")
+               
+         IS[i] = chr(curPad ^ ord(block[i]))
+         errCode = '403'
+         curTry = -1
+      msgPart = XOR_text_key("".join(IS), aCT[i*16,(i*16)+16])
+      plainText = msgPart + plainText
+      print(plainText)
 
-print(XOR_text_key(hex_to_ascii('6a893e9c7a4ac7657d47944db7c63188'), hex_to_ascii('3edf1ef11527aa045167dd6adaab5089')))
+#print(XOR_text_key(hex_to_ascii('6a893e9c7a4ac7657d47944db7c63188'), hex_to_ascii('3edf1ef11527aa045167dd6adaab5089')))
