@@ -47,7 +47,9 @@ def checkValidPadding():
    aCT = hex_to_ascii(cipherText)
    ourCipherText = os.urandom(48)
    IS = ['\0'] * 16
-   firstCT = ourCipherText[0:len(ourCipherText) - 16]
+   #firstCT = ourCipherText[0:len(ourCipherText) - 16]
+   firstCT = aCT[0:16]
+   lastCT = aCT[32:48]
    #ourCipherText[len(ourCipherText) - 16:len(ourCipherText)]
    errCode = 403
    
@@ -58,14 +60,14 @@ def checkValidPadding():
       block = list(os.urandom(16))
       
       for j in range(15, i, -1):
-	      block[j] = chr((16 - i) ^ ord(IS[j]))
+	      block[j] = chr(curPad ^ ord(IS[j]))
          
       print(block)
 
       while errCode != '404':
             curTry += 1
             block[i] = chr(curTry)
-            r = requests.get("http://localhost:8080/?enc=" + ascii_to_hex(firstCT) + ascii_to_hex("".join(block)))
+            r = requests.get("http://localhost:8080/?enc=" + ascii_to_hex(firstCT) + ascii_to_hex("".join(block)) + ascii_to_hex(lastCT))
             errCode = str(r).split("[")[1].split("]")[0].strip("\n")
             
       IS[i] = chr(curPad ^ ord(block[i]))
