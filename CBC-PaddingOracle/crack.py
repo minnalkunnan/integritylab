@@ -42,24 +42,23 @@ def XOR_text_key ( text , key ):
    new_text = hex_to_ascii(hex_new_text)
    return new_text
    
-def checkValidPadding():
-   cipherText = 'b90cfd37bdbda3237fa83800d67f19c03edf1ef11527aa045167dd6adaab50894d65b7dfe2d30c065f47a259a4c1c81d'
+def task1crack():
+   r = requests.get("http://localhost:8080/eavesdrop")
+   cipherText = r.text.split("red\"> ", 1)[1].split(" <", 1)[0]
+
    plainText = ""
    aCT = hex_to_ascii(cipherText)
    ourCipherText = os.urandom(48)
    
-   #firstCT = ourCipherText[0:len(ourCipherText) - 16]
-   
-   #ourCipherText[len(ourCipherText) - 16:len(ourCipherText)]
    errCode = 403
    
    curTry = -1
-   
+
    for b in range (len(aCT) / 16 - 2, -1, -1):
-      firstCT = aCT[0:(i*16)]
-      lastCT = aCT[(i*16) + 16:(i*16) + 32]
+      firstCT = aCT[0:(b*16)]
+      lastCT = aCT[(b*16) + 16:(b*16) + 32]
       IS = ['\0'] * 16
-      
+
       for i in range (15, -1, -1):
          curPad = 16 - i
          block = list(os.urandom(16))
@@ -78,8 +77,8 @@ def checkValidPadding():
          IS[i] = chr(curPad ^ ord(block[i]))
          errCode = '403'
          curTry = -1
-      msgPart = XOR_text_key("".join(IS), aCT[i*16,(i*16)+16])
+      msgPart = XOR_text_key("".join(IS), aCT[b*16:(b*16)+16])
       plainText = msgPart + plainText
       print(plainText)
 
-#print(XOR_text_key(hex_to_ascii('6a893e9c7a4ac7657d47944db7c63188'), hex_to_ascii('3edf1ef11527aa045167dd6adaab5089')))
+task1crack()
