@@ -1,5 +1,4 @@
 import sys
-import bitarray
 
 def rotate(l, n):
     return l[n:] + l[:n]
@@ -46,6 +45,7 @@ def XOR_text_key ( text , key ):
 
 def tobits(s):
     result = []
+    print(len(s))
     for c in s:
         bits = bin(ord(c))[2:]
         bits = '00000000'[len(bits):] + bits
@@ -60,87 +60,103 @@ def frombits(bits):
     return ''.join(chars)
 
 def sha1(message):
-	h0 = 0x67452301
-	h1 = 0xEFCDAB89
-	h2 = 0x98BADCFE
-	h3 = 0x10325476
-	h4 = 0xC3D2E1F0
+   h0 = 0x67452301
+   h1 = 0xEFCDAB89
+   h2 = 0x98BADCFE
+   h3 = 0x10325476
+   h4 = 0xC3D2E1F0
 
-	#get message length in bits
-	messageLength = len(message) * 8
-	originalMessageLength = messageLength
+   #get message length in bits
+   messageLength = len(message) * 8
+   originalMessageLength = messageLength
 
-	#pre processing
-	bitMessage = tobits(message)
-	#bitMessage = ''.join(format(ord(x), 'b') for x in message)
-	bitMessage.append(1)
-	bitMessageLen = len(bitMessage)
+   #pre processing
+   bitMessage = tobits(message)
+   #bitMessage = ''.join(format(ord(x), 'b') for x in message)
+   bitMessage.append(1)
+   bitMessageLen = len(bitMessage)
 
-	while bitMessageLen % 512 != 448:
-		bitMessage.append(0)
-		bitMessageLen += 1
+   while bitMessageLen % 512 != 448:
+      bitMessage.append(0)
+      bitMessageLen += 1
 
-	#appendedLength = bin(originalMessageLength).replace('b', '')
-	appendedLength = tobits(str(originalMessageLength))
-	zeroesNeeded = 64 - len(appendedLength)
-	while zeroesNeeded != 0:
-		appendedLength.insert(0, 0)
-		zeroesNeeded -= 1
-	
-	bitMessage = bitMessage + appendedLength
-	bitMessage = [bitMessage[i:i+512] for i in range(0, len(bitMessage), 512)]
+   #appendedLength = bin(originalMessageLength).replace('b', '')
+   appendedLength = tobits(str(originalMessageLength))
+   zeroesNeeded = 64 - len(appendedLength)
+   while zeroesNeeded != 0:
+      appendedLength.insert(0, 0)
+      zeroesNeeded -= 1
 
-	print(bitMessage)
+   bitMessage = bitMessage + appendedLength
+   bitMessage = [bitMessage[i:i+512] for i in range(0, len(bitMessage), 512)]
 
-	for chunk in bitMessage:
-		words = [chunk[i:i+32] for i in range(0, len(chunk), 32)]
-		print(words)
-		print("Words length\n" + str(len(words)))
+   print(bitMessage)
 
-		for i in range(16, 79):
-			words.insert(i, rotate(tobits((XOR_text_key(XOR_text_key(XOR_text_key(frombits(words[i - 3]), frombits(words[i - 8])), frombits(words[i - 14])), frombits(words[i - 16])))), 1))
-			print(words[i])
+   for chunk in bitMessage:
+      words = [chunk[i:i+32] for i in range(0, len(chunk), 32)]
+   print(words)
+   print("Words length\n" + str(len(words)))
 
-		a = h0
-		b = h1
-		c = h2
-		d = h3
-		e = h4
+   for i in range(16, 79):
+      words.insert(i, rotate(tobits((XOR_text_key(XOR_text_key(XOR_text_key(frombits(words[i - 3]), frombits(words[i - 8])), frombits(words[i - 14])), frombits(words[i - 16])))), 1))
+      print(words[i])
 
-		for i in range(0, 79):
-			if 0 <= i <= 19:
-				f = (b & c) | (~b) & d
-				k = 0x5A827999
-			elif 20 <= i <= 39:
-				f = b ^ c ^ d
-				k = 0x6ED9EBA1
-			elif 40 <= i <= 59:
-				f = (b & c) | (b & d) | (c & d) 
-				k = 0x8F1BBCDC
-			elif 60 <= i <= 79:
-				f = b ^ c ^ d
-				k = 0xCA62C1D6
-			print("supwitit")
-			temp = 5
-			temp = int(ascii_to_hex(frombits(rotate(tobits('{:02X}'.format(a)), 5))), 16) + f + e + k + int(ascii_to_hex(frombits(words[i])), 16)
-			e = d
-			d = c
-			c = int(ascii_to_hex(frombits(rotate(tobits('{:02X}'.format(b)), 30))), 16)
-			b = a
-			a = temp
+   a = h0
+   b = h1
+   c = h2
+   d = h3
+   e = h4
 
-		h0 = h0 + a
-		h1 = h1 + b 
-		h2 = h2 + c
-		h3 = h3 + d
-		h4 = h4 + e
+   for i in range(0, 79):
+      if 0 <= i <= 19:
+         f = (b & c) | (~b) & d
+         k = 0x5A827999
+      elif 20 <= i <= 39:
+         f = b ^ c ^ d
+         k = 0x6ED9EBA1
+      elif 40 <= i <= 59:
+         f = (b & c) | (b & d) | (c & d) 
+         k = 0x8F1BBCDC
+      elif 60 <= i <= 79:
+         f = b ^ c ^ d
+         k = 0xCA62C1D6
+      print("supwitit")
+      temp = 5
+      print(a)
+      print(str(a))
 
-	finalHash = (h0 << 128) | (h1 << 96) | (h2 << 64) | (h3 << 32) | h4
+   """
+   uhh = frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(a))), 5))
+   uh = ascii_to_hex(frombits(rotate(tobits('{:02X}'.format(a)), 5)))
+   for j in range(0, 79):
+      print(tobits(hex_to_ascii('{:02X}'.format(a))))
+      print(a)
+      print('{:02X}'.format(a))
+      print("HAHHHHHEEEEYY")
+      print(uh)
+      a = int(ascii_to_hex(frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(a))), 5))),16)
+   """
 
-	return finalHash
+   temp = int(ascii_to_hex(frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(a))), 5))), 16) + f + e + k + int(ascii_to_hex(frombits(words[i])), 16)
+   e = d
+   d = c
+   c = int(ascii_to_hex(frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(b))), 30))), 16)
+   b = a
+   a = temp
+
+   h0 = h0 + a
+   h1 = h1 + b 
+   h2 = h2 + c
+   h3 = h3 + d
+   h4 = h4 + e
+
+   finalHash = (h0 << 128) | (h1 << 96) | (h2 << 64) | (h3 << 32) | h4
+
+   return finalHash
 
 
 #print(int(ascii_to_hex(frombits(rotate(tobits('{:02X}'.format(0x67452301)), 5))), 16))
-sha1("hello")
+fH = sha1("abc")
+print(int(str(fH), 16))
 #print(tobits('hello'))
 #print(frombits('01101000110010111011001101100110111110000000000000000000000000000'))
