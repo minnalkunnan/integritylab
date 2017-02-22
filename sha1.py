@@ -162,8 +162,7 @@ def task2b():
       else:
          hashes[key] = str(i)
       i += 1
-   
-task2b()
+
 """
 ms = ""
 for i in range(16777216):
