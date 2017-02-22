@@ -1,8 +1,17 @@
 import sys
 import numpy
 
+def to_bytes(n, length, endianess):
+    h = '%x' % n
+    s = ('0'*(len(h) % 2) + h).zfill(length*2).decode('hex')
+    return s if endianess == 'big' else s[::-1]
+
 def rotate(l, n):
     return l[n:] + l[:n]
+    
+def _left_rotate(n, b):
+    """Left rotate a 32-bit integer n by b bits."""
+    return ((n << b) | (n >> (32 - b))) & 0xffffffff
 
 def ascii_to_hex ( ascii_text ):
    #print(len(ascii_text))
@@ -51,12 +60,10 @@ def XOR_text_key ( text , key ):
 
 def tobits(s):
     result = []
-    #print(len(s))
     for c in s:
         bits = bin(ord(c))[2:]
         bits = '00000000'[len(bits):] + bits
         result.extend([int(b) for b in bits])
-    #print(len(bits))
     return result
 
 def frombits(bits):
@@ -68,10 +75,10 @@ def frombits(bits):
 
 def sha1(message):
    h0 = 0x67452301
-   h1 = 0xEFCDAB89
-   h2 = 0x98BADCFE
+   h1 = 0xefcdab89
+   h2 = 0x98badcfe
    h3 = 0x10325476
-   h4 = 0xC3D2E1F0
+   h4 = 0xc3d2e1f0
 
    #get message length in bits
    messageLength = len(message) * 8
@@ -87,89 +94,84 @@ def sha1(message):
       bitMessage.append(0)
       bitMessageLen += 1
 
-   #appendedLength = bin(originalMessageLength).replace('b', '')
-   appendedLength = tobits(str(originalMessageLength))
-   zeroesNeeded = 64 - len(appendedLength)
+   appendedLength = "{0:b}".format(originalMessageLength)
+   lenArr = []
+   for c in appendedLength:
+      lenArr.append(int(c))
+   zeroesNeeded = 64 - len(lenArr)
    while zeroesNeeded != 0:
-      appendedLength.insert(0, 0)
+      lenArr.insert(0, 0)
       zeroesNeeded -= 1
 
-   bitMessage = bitMessage + appendedLength
+   bitMessage = bitMessage + lenArr
    bitMessage = [bitMessage[i:i+512] for i in range(0, len(bitMessage), 512)]
 
-   #print(bitMessage)
-
+   words = []
    for chunk in bitMessage:
-      words = [chunk[i:i+32] for i in range(0, len(chunk), 32)]
-   #print(words)
-   #print("Words length\n" + str(len(words)))
+      words = [int(ascii_to_hex(frombits(chunk[i:i+32])), 16) for i in range(0, len(chunk), 32)]
 
-   for i in range(16, 79):
-      words.insert(i, rotate(tobits((XOR_text_key(XOR_text_key(XOR_text_key(frombits(words[i - 3]), frombits(words[i - 8])), frombits(words[i - 14])), frombits(words[i - 16])))), 1))
-      #print(words[i])
+      for i in range(16, 80):
+         words.insert(i, _left_rotate(words[i - 3] ^ words[i - 8] ^ words[i - 14] ^ words[i - 16], 1))
+      
+      a = h0
+      b = h1
+      c = h2
+      d = h3
+      e = h4
 
-   a = h0
-   b = h1
-   c = h2
-   d = h3
-   e = h4
+      for i in range(0, 80):
+         if 0 <= i <= 19:
+            f = (b & c) | ((~b) & d)
+            k = 0x5a827999
+         elif 20 <= i <= 39:
+            f = ((b ^ c) ^ d)
+            k = 0x6ed9eba1
+         elif 40 <= i <= 59:
+            f = (b & c) | (b & d) | (c & d) 
+            k = 0x8f1bbcdc
+         elif 60 <= i <= 79:
+            f = ((b ^ c) ^ d)
+            k = 0xca62c1d6
+            
+         temp = (_left_rotate(a, 5) + f + e + k + words[i]) & 0xffffffff
+         e = d
+         d = c
+         c = (_left_rotate(b, 30)) & 0xffffffff
+         b = a
+         a = temp
 
-   for i in range(0, 79):
-      if 0 <= i <= 19:
-         f = (b & c) | ((~b) & d)
-         k = 0x5A827999
-      elif 20 <= i <= 39:
-         f = ((b ^ c) ^ d)
-         k = 0x6ED9EBA1
-      elif 40 <= i <= 59:
-         f = (b & c) | (b & d) | (c & d) 
-         k = 0x8F1BBCDC
-      elif 60 <= i <= 79:
-         f = ((b ^ c) ^ d)
-         k = 0xCA62C1D6
-      #print("supwitit")
-      temp = 5
-      #print(a)
-      #print(str(a))
 
-      #print("s")
-      #print("i: " + str(i))
-      #print(a)
-      temp = numpy.uint32((int(ascii_to_hex(frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(a))), 5))), 16) + f + e + k + int(ascii_to_hex(frombits(words[i])), 16)))
-      #print("e")
-      e = d
-      d = c
-      c = numpy.uint32(int(ascii_to_hex(frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(b))), 30))), 16))
-      b = a
-      a = temp
-      #print("LEN: " + len(tobits(hex_to_ascii('{:02X}'.format(a)))))
-
-   h0 = numpy.uint32(h0 + a)
-   h1 = numpy.uint32(h1 + b)
-   h2 = numpy.uint32(h2 + c)
-   h3 = numpy.uint32(h3 + d)
-   h4 = numpy.uint32(h4 + e)
-
-   print(hex(h0 << 128))
-   print(h0)
+      h0 = (h0 + a) & 0xffffffff
+      h1 = (h1 + b) & 0xffffffff
+      h2 = (h2 + c) & 0xffffffff
+      h3 = (h3 + d) & 0xffffffff
+      h4 = (h4 + e) & 0xffffffff
+   
    finalHash = (h0 << 128) | (h1 << 96) | (h2 << 64) | (h3 << 32) | h4
 
    return finalHash
 
-
-#print(int(ascii_to_hex(frombits(rotate(tobits('{:02X}'.format(0x67452301)), 5))), 16))
-fH = sha1("abc")
-print(str(hex(fH)))
-#print(tobits('hello'))
-#print(frombits('01101000110010111011001101100110111110000000000000000000000000000'))
+def task2b():
+   i = 0
+   hashes = {}
+   notdone = True
+   while notdone:
+      fh = sha1(str(i))
+      key = str(fh & 0x3ffffffffffff)
+      if key in hashes.keys():
+         print("Collision!")
+         print("Key (Hash): " + key)
+         print("Val 1: " + str(hashes[key]))
+         print("Val 2: " + str(i))
+         notdone = False
+      else:
+         hashes[key] = str(i)
+      i += 1
+   
 """
-uhh = frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(a))), 5))
-uh = ascii_to_hex(frombits(rotate(tobits('{:02X}'.format(a)), 5)))
-for j in range(0, 79):
-   print(tobits(hex_to_ascii('{:02X}'.format(a))))
-   print(a)
-   print('{:02X}'.format(a))
-   print("HAHHHHHEEEEYY")
-   print(uh)
-   a = int(ascii_to_hex(frombits(rotate(tobits(hex_to_ascii('{:02X}'.format(a))), 5))),16)
+ms = ""
+for i in range(16777216):
+   ms = ms + "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno"
+fH = sha1(ms)
+print(str(hex(fH))[2:len(str(hex(fH)))-1])
 """
