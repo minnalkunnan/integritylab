@@ -167,7 +167,8 @@ def task2b():
       else:
          hashes[key] = str(i)
       i += 1
-   
+
+print(hex(sha1('abc')))
 """
 ms = ""
 for i in range(16777216):
