@@ -3,6 +3,12 @@ from Crypto import Hash
 from Crypto.Hash import SHA
 from Crypto.Hash import HMAC as hmac
 
+def ascii_to_hex ( ascii_text ):
+   #print(len(ascii_text))
+   hex_text = ascii_text.encode("hex");
+   #print(hex_text)
+   return hex_text
+   
 class HMAC:
 	def __init__(self):
 		self.key = os.urandom(SHA.digest_size)
@@ -14,17 +20,17 @@ class HMAC:
 	def hmac_sha1_verify(self, key, msg, tag):
 		h = hmac.new(key,msg,SHA)
 		tag_new = h.digest()
+
+		print(ascii_to_hex(tag_new))
 		#An obvious check
 		if len(tag) != len(tag_new):
 			return False
 		#Now, for extra security, check each byte, one at a time
 		for i in range(len(tag)):
-			print(ord(tag_new[i]))
-			print(ord(tag[i]))
 			if tag[i] != tag_new[i]:
 				return False
 			else:
-				time.sleep(1.01)	
+				time.sleep(.02)	
 		return True
 
 	def verify_query(self, msg, tag):
