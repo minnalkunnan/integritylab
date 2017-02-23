@@ -8,20 +8,24 @@ def ascii_to_hex ( ascii_text ):
    hex_text = ascii_text.encode("hex");
    #print(hex_text)
    return hex_text
-   
+
 class HMAC:
 	def __init__(self):
 		self.key = os.urandom(SHA.digest_size)
-	
+		h =  hmac.new(self.key,'test',SHA)
+		tag = h.digest()
+		print(ascii_to_hex(tag))
+
 	def hmac_sha1_sign(self, key, msg):
 		h =  hmac.new(key,msg,SHA)
-		return h.digest()
+		value = h.digest()
+		#print(value)
+		return value
 
 	def hmac_sha1_verify(self, key, msg, tag):
 		h = hmac.new(key,msg,SHA)
 		tag_new = h.digest()
-
-		print(ascii_to_hex(tag_new))
+		#print(ascii_to_hex(tag_new))
 		#An obvious check
 		if len(tag) != len(tag_new):
 			return False
@@ -30,7 +34,7 @@ class HMAC:
 			if tag[i] != tag_new[i]:
 				return False
 			else:
-				time.sleep(.02)	
+				time.sleep(.03)	
 		return True
 
 	def verify_query(self, msg, tag):
