@@ -73,11 +73,10 @@ def frombits(bits):
         chars.append(chr(int(''.join([str(bit) for bit in byte]), 2)))
     return ''.join(chars)
 
-def sha1(h0, h1, h2, h3, h4, message):
+def sha(h0, h1, h2, h3, h4, message):
    #get message length in bits
    messageLength = len(message) * 8
    originalMessageLength = messageLength
-
    #pre processing
    bitMessage = tobits(message)
    #bitMessage = ''.join(format(ord(x), 'b') for x in message)
@@ -168,10 +167,4 @@ def task2b():
 #task2b()
 """
 
-def task3a():
-   h0 = 0x67452301
-   h1 = 0xefcdab89
-   h2 = 0x98badcfe
-   h3 = 0x10325476
-   h4 = 0xc3d2e1f0
-   sha1(h0, h1, h2, h3, h4, str(i))
+
