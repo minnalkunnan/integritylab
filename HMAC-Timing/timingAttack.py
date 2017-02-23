@@ -1,14 +1,29 @@
 import requests
 import time
 
+def ascii_to_hex ( ascii_text ):
+   #print(len(ascii_text))
+   hex_text = ascii_text.encode("hex");
+   #print(hex_text)
+   return hex_text
+   
+def hex_to_ascii ( hex_text ):
+   #print(len(hex_text))
+   #print(hex_text)
+   if len(hex_text) % 2 != 0:
+      hex_text = "0" + hex_text
+   ascii_text = hex_text.decode("hex");
+   #print(ascii_text)
+   return ascii_text
+
 def attack():
-	mac = ['0'] * 40
-	url = 'http://localhost:8080/?q=foo&mac=' + ''.join(mac)
+	mac = [chr(0)] * 20
+	url = 'http://localhost:8080/?q=foo&mac=' + ascii_to_hex(''.join(mac))
 	r = requests.get(url)
 
-	for i in range(16):
-		mac[0] = str(hex(i))[2:]
-		url = 'http://localhost:8080/?q=foo&mac=' + ''.join(mac)
+	for i in range(256):
+		mac[0] = chr(i)
+		url = 'http://localhost:8080/?q=foo&mac=' + ascii_to_hex(''.join(mac))
 		print(url)
 		start_time = time.time()
 		r = requests.get(url)
