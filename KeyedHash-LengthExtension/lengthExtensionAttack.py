@@ -22,13 +22,24 @@ def hash(message, tag):
 
 def attack():
 	message = 'Funny%20names?'
+	size = 12
 	i = 0
-	for i in range(512):
-		zeros = '%00' * i
-		ourMessage = message + '%80' + zeros + '%60'
+	for i in range(20):
+		zeros = '%00' * (59 - size)
+		sizeStr = ""
+		for j in range(3, -1, -1):
+			#print(hex(size >> (j * 4)))
+			partial = (str(hex((size >> (j * 8)) & 0xff)))[2:]
+			if len(partial) % 2 == 1:
+				partial = "0" + partial
+			sizeStr += '%' + partial
+			
+		ourMessage = message + '%80' + zeros + sizeStr
 		tag = hash('sup', 'e0800a310b4a9b224dd02ba081419440f659d187')
 		url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + 'e0800a310b4a9b224dd02ba081419440f659d187'
-		#print(url)
+		print(url)
+		size += 1
+		print(url)
 		r = requests.get(url)
 		if 'Invalid signature' in r.text:
 			print "we suck"
