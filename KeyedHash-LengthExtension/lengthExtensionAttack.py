@@ -21,30 +21,41 @@ def hash(message, tag):
 
 
 def attack():
-	message = 'Funny%20names?'
-	size = 12
+	secretsize = 40
+	ourMessage = 'Funny%20names?'
+	msgsize = 12 + secretsize
+	size = msgsize
 	i = 0
-	for i in range(60 - size):
-		zeros = '%00' * (59 - size)
-		sizeStr = ""
-		for j in range(3, -1, -1):
-			#print(hex(size >> (j * 4)))
-			partial = (str(hex((size >> (j * 8)) & 0xff)))[2:]
-			if len(partial) % 2 == 1:
-				partial = "0" + partial
-			sizeStr += '%' + partial
-			
-		ourMessage = message + '%80' + zeros + sizeStr
-		tag = hash('sup', '121dcea87e135cf769e22add789fba74ca40ad0d')
-		url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + '121dcea87e135cf769e22add789fba74ca40ad0d'
-		#print(url)
+	#for i in range(60 - size):
+	ourMessage = ourMessage + '%80'
+	size += 1
+	while (size * 8) % 512 != 448:
+		ourMessage = ourMessage + '%00'
 		size += 1
-		#print(url)
-		r = requests.get(url)
-		if 'Invalid signature' in r.text:
-			print "we suck"
-		else:
-			print "deal with it"
-			print url
+	
+	zeros = '%00' * (59 - size)
+	sizeStr = ""
+	for j in range(7, -1, -1):
+		#print(hex(size >> (j * 4)))
+		partial = (str(hex(((msgsize*8) >> (j * 8)) & 0xff)))[2:]
+		if len(partial) % 2 == 1:
+			partial = "0" + partial
+		sizeStr += '%' + partial
+		
+	ourMessage = ourMessage + sizeStr
+	tag = hash('sup', '121dcea87e135cf769e22add789fba74ca40ad0d')
+	url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + '121dcea87e135cf769e22add789fba74ca40ad0d'
+	print("SIZE MESSAGE: " + str(msgsize))
+	print("SIZE OF LAST BLOCK MINUS SIZE: " + str(size))
+	print("SIZE OF SIZE STRING: " + str(len(sizeStr) / 3))
+	print(url)
+	size += 1
+	#print(url)
+	r = requests.get(url)
+	if 'Invalid signature' in r.text:
+		print "we suck"
+	else:
+		print "deal with it"
+		print url
 			
 attack()
