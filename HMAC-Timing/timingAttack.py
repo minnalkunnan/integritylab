@@ -16,6 +16,16 @@ def hex_to_ascii ( hex_text ):
    #print(ascii_text)
    return ascii_text
 
+def maxOfPosFltArr(arr):
+	largest = -1.0
+	ind = -1
+	for i in range(0, len(arr)):
+		if arr[i] > largest:
+			largest = arr[i]
+			ind = i
+
+	return ind
+
 def attack():
 	mac = [chr(0)] * 20
 	url = 'http://localhost:8080/?q=foo&mac=' + ascii_to_hex(''.join(mac))
@@ -37,8 +47,7 @@ def attack():
 			elapsed_time = time.time() - start_time
 			times.append(elapsed_time)
 
-		slowest = times.index(max(times))
-		mac[ind] = chr(slowest)
+		mac[ind] = chr(maxOfPosFltArr(times))
 	
 	print(ascii_to_hex(''.join(mac)))
 
