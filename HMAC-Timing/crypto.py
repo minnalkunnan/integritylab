@@ -14,12 +14,13 @@ class HMAC:
 	def hmac_sha1_verify(self, key, msg, tag):
 		h = hmac.new(key,msg,SHA)
 		tag_new = h.digest()
-
 		#An obvious check
 		if len(tag) != len(tag_new):
 			return False
 		#Now, for extra security, check each byte, one at a time
 		for i in range(len(tag)):
+			print(ord(tag_new[i]))
+			print(ord(tag[i]))
 			if tag[i] != tag_new[i]:
 				return False
 			else:

@@ -2,7 +2,7 @@ import requests
 import time
 
 def attack():
-	mac = ['0'] * 16
+	mac = ['0'] * 40
 	url = 'http://localhost:8080/?q=foo&mac=' + ''.join(mac)
 	r = requests.get(url)
 
@@ -12,7 +12,6 @@ def attack():
 		print(url)
 		start_time = time.time()
 		r = requests.get(url)
-		print(r.text)
 		#if 'Invalid signature' not in r.text:
 		#	print 'Success'
 		#	print mac
