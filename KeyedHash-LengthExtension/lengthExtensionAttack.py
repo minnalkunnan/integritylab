@@ -24,7 +24,7 @@ def attack():
 	message = 'Funny%20names?'
 	size = 12
 	i = 0
-	for i in range(20):
+	for i in range(60 - size):
 		zeros = '%00' * (59 - size)
 		sizeStr = ""
 		for j in range(3, -1, -1):
@@ -35,15 +35,16 @@ def attack():
 			sizeStr += '%' + partial
 			
 		ourMessage = message + '%80' + zeros + sizeStr
-		tag = hash('sup', 'e0800a310b4a9b224dd02ba081419440f659d187')
-		url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + 'e0800a310b4a9b224dd02ba081419440f659d187'
-		print(url)
+		tag = hash('sup', '121dcea87e135cf769e22add789fba74ca40ad0d')
+		url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + '121dcea87e135cf769e22add789fba74ca40ad0d'
+		#print(url)
 		size += 1
-		print(url)
+		#print(url)
 		r = requests.get(url)
 		if 'Invalid signature' in r.text:
 			print "we suck"
 		else:
 			print "deal with it"
+			print url
 			
 attack()
