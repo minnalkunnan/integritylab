@@ -49,31 +49,50 @@ def maxOfPosFltArr(arr):
 
 def attack():
 	choices = ['0'] * 3
+	subchoices = ['0'] * 3
 
 	mac = [chr(0)] * 20
 	url = 'http://localhost:8080/?q=test&mac=' + ascii_to_hex(''.join(mac))
 	r = urllib2.urlopen(url).read()
-	branch = 0
+	slowest = 0.0
+	indSlow = 0
 
+   branchAmount = 1
 	for ind in range(20):
-		if ind != 0:
-			mac[ind-1] = choices[branch]
-			branch + 1
-
+		if ind == 1:
+			branchAmount = 3
+			
 		times = []
-		for i in range(256):
-			mac[ind] = chr(i)
-			url = 'http://localhost:8080/?q=test&mac=' + ascii_to_hex(''.join(mac))
-			print(url)
+		slowest = 0.0
+		for j in range(branchAmount):
+			if ind != 0:
+				mac[ind - 1] = choices[j]
 
-			start_time = time.time()
-			r = urllib2.urlopen(url)
-			elapsed_time = time.time() - start_time
+			for i in range(256):
+				mac[ind] = chr(i)
+				url = 'http://localhost:8080/?q=test&mac=' + ascii_to_hex(''.join(mac))
+				print(url)
 
-			times.append(elapsed_time)
+				start_time = time.time()
+				r = urllib2.urlopen(url)
+				elapsed_time = time.time() - start_time
+
+				times.append(elapsed_time)
+		
+		if ind != 0:
+			for j in range(len(times)):
+				if times[j] > slowest:
+					slowest = times[j]
+					indSlow = j
+			times = times[(indSlow // 256) * 256:((indSlow // 256) * 256) + 256]
+			mac[ind-1] = choices[indSlow // 256]
 
 		choices = maxOfPosFltArr(times)
 		#mac[ind] = chr(maxOfPosFltArr(times))
+	for i in range(3):
+		mac[19] = choices[i]
+		print(ascii_to_hex(''.join(mac)))
+	
 	
 	#print(ascii_to_hex(''.join(mac)))
 

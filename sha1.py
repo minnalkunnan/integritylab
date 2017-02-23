@@ -152,25 +152,30 @@ def sha1(message):
 
 def task2b():
    i = 0
-   hashes = {}
+   hashes = set()
    notdone = True
    while notdone:
+      if i % 50000 == 0:
+         print(i)
       hex_string = '{:02x}'.format(i)
-      if hex_string[len(hex_string) - 1] == 'L':
-         hex_string = hex_string[:len(hex_string)-1]
-      fh = sha1(hex_to_ascii(hex_string))
+      #print(hex_string)
+      #if hex_string[len(hex_string) - 1] == 'L':
+      #   hex_string = hex_string[:len(hex_string)-1]
+      fh = sha1(hex_string)
       key = str(fh & 0x3ffffffffffff)
-      if key in hashes.keys():
+      if key in hashes:
          print("Collision!")
          print("Key (Hash): " + key)
-         print("Val 1: " + str(hashes[key]))
-         print("Val 2: " + str(i))
+         print("Val 1: " + str(i))
+         #print("Val 2: " + str(i))
          notdone = False
       else:
-         hashes[key] = str(i)
+         hashes.add(key)
       i += 1
 
-task2b()
+#task2b()
+print(str(hex(sha1("6932777") & 0x3ffffffffffff)))
+print(str(hex(sha1("8078049") & 0x3ffffffffffff)))
 
 """
 ms = ""
