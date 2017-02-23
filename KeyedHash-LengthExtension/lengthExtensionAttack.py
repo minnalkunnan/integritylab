@@ -1,7 +1,7 @@
-import requests
+#import requests
 import sha1
 
-def hash(message, tag):
+def hash(message, tag, prevSize):
    mac = int(tag, 16)
    
    h0 = (mac >> 128) & 0xffffffff
@@ -16,7 +16,7 @@ def hash(message, tag):
    print(hex(h3))
    print(hex(h4))
    """
-   a = sha1.sha(h0, h1, h2, h3, h4, message)
+   a = sha1.sha(h0, h1, h2, h3, h4, message, prevSize)
    return (str(hex(a))[2:len(str(hex(a))) - 1])
 
 
@@ -41,21 +41,21 @@ def attack():
 		if len(partial) % 2 == 1:
 			partial = "0" + partial
 		sizeStr += '%' + partial
-		
+	size += len(sizeStr) / 3
 	ourMessage = ourMessage + sizeStr
-	tag = hash('sup', '121dcea87e135cf769e22add789fba74ca40ad0d')
+	tag = hash('sup', '121dcea87e135cf769e22add789fba74ca40ad0d', size)
 	url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + '121dcea87e135cf769e22add789fba74ca40ad0d'
 	print("SIZE MESSAGE: " + str(msgsize))
-	print("SIZE OF LAST BLOCK MINUS SIZE: " + str(size))
+	print("SIZE OF EVERYTHING: " + str(size))
 	print("SIZE OF SIZE STRING: " + str(len(sizeStr) / 3))
 	print(url)
 	size += 1
 	#print(url)
-	r = requests.get(url)
-	if 'Invalid signature' in r.text:
-		print "we suck"
-	else:
-		print "deal with it"
-		print url
+	#r = requests.get(url)
+	#if 'Invalid signature' in r.text:
+	#	print "we suck"
+	#else:
+	#	print "deal with it"
+	#	print url
 			
 attack()

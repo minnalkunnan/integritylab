@@ -73,9 +73,9 @@ def frombits(bits):
         chars.append(chr(int(''.join([str(bit) for bit in byte]), 2)))
     return ''.join(chars)
 
-def sha(h0, h1, h2, h3, h4, message):
+def sha(h0, h1, h2, h3, h4, message, previousSize):
    #get message length in bits
-   messageLength = len(message) * 8
+   messageLength = (len(message) * 8) + (previousSize * 8)
    originalMessageLength = messageLength
    #pre processing
    bitMessage = tobits(message)

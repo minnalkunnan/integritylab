@@ -174,8 +174,8 @@ def task2b():
       i += 1
 
 #task2b()
-print(str(hex(sha1("6932777") & 0x3ffffffffffff)))
-print(str(hex(sha1("8078049") & 0x3ffffffffffff)))
+print(str(hex(sha1("13644212") & 0x3ffffffffffff)))
+print(str(hex(sha1("16937134") & 0x3ffffffffffff)))
 
 """
 ms = ""
