@@ -19,7 +19,7 @@ class HMAC:
 	def hmac_sha1_sign(self, key, msg):
 		h =  hmac.new(key,msg,SHA)
 		value = h.digest()
-		#print(value)
+		print(ascii_to_hex(value))
 		return value
 
 	def hmac_sha1_verify(self, key, msg, tag):
@@ -34,7 +34,7 @@ class HMAC:
 		for i in range(len(tag)):
 			if tag[i] != tag_new[i]:
 				flag = False
-			time.sleep(.01)	
+			time.sleep(.005)	
 		return flag
 
 	def verify_query(self, msg, tag):
