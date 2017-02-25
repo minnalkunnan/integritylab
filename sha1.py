@@ -151,31 +151,40 @@ def sha1(message):
    return finalHash
 
 def task2b():
-   i = 0
+   i = 13000000
    hashes = set()
    notdone = True
+   prevsize = 0
+   size = 0
    while notdone:
       if i % 50000 == 0:
          print(i)
-      hex_string = '{:02x}'.format(i)
+      if i == 13644212:
+         print(str(i))
+         print(sha1(str(i)) & 0x3ffffffffffff)
+      if i == 16937134:
+         print(str(i))
+         print(sha1(str(i)) & 0x3ffffffffffff)
       #print(hex_string)
       #if hex_string[len(hex_string) - 1] == 'L':
       #   hex_string = hex_string[:len(hex_string)-1]
-      fh = sha1(hex_string)
-      key = str(fh & 0x3ffffffffffff)
-      if key in hashes:
+      fh = sha1(str(i))
+      key = fh & 0x3ffffffffffff
+      hashes.add(key)
+      if i == len(hashes):
          print("Collision!")
-         print("Key (Hash): " + key)
+         print("Key (Hash): " + str(key))
          print("Val 1: " + str(i))
          #print("Val 2: " + str(i))
          notdone = False
-      else:
-         hashes.add(key)
+      
       i += 1
 
-#task2b()
 print(str(hex(sha1("13644212") & 0x3ffffffffffff)))
 print(str(hex(sha1("16937134") & 0x3ffffffffffff)))
+
+task2b()
+
 
 """
 ms = ""
