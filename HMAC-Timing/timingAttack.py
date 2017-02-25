@@ -26,7 +26,7 @@ def maxOfPosFltArr(arr):
 	ind3 = -1
 
 	for i in range(0, len(arr)):
-		if arr[i] > largest :
+		if arr[i] > largest:
 			largest3 = largest2
 			ind3 = ind2
 
@@ -35,13 +35,13 @@ def maxOfPosFltArr(arr):
 
 			largest = arr[i]
 			ind = i
-		elif  arr[i] > largest2
+		elif  arr[i] > largest2:
 			largest3 = largest2
 			ind3 = ind2
 
 			largest2 = arr[i]
 			ind2 = i
-		elif arr[i] > largest3
+		elif arr[i] > largest3:
 			largest3 = arr[i]
 			ind3 = i
 
@@ -57,7 +57,7 @@ def attack():
 	slowest = 0.0
 	indSlow = 0
 
-   branchAmount = 1
+	branchAmount = 1
 	for ind in range(20):
 		if ind == 1:
 			branchAmount = 3
@@ -98,5 +98,4 @@ def attack():
 
 attack()
 #3d33728b33b977d5c4c5317fee74398ec93b638a
-3d33728b33b977d5c4c5
 

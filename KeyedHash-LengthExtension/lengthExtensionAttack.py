@@ -1,4 +1,4 @@
-#import requests
+import requests
 import sha1
 
 def hash(message, tag, prevSize):
@@ -22,8 +22,13 @@ def hash(message, tag, prevSize):
 
 def attack():
 	secretsize = 40
-	ourMessage = 'Funny%20names?'
-	msgsize = 12 + secretsize
+	ourMessage = 'Nicknames,%20nicknames.%20Now,%20on%20the%20St.%20Louis%20team%20we%20have%20Who%27s%20on%20first,%20What%27s%20on%20second,%20I%20Don%27t%20Know%20is%20on%20third--'
+	msgsize = len(ourMessage)
+	for c in ourMessage:
+		if c == '%':
+			msgsize -= 2
+
+	msgsize += secretsize
 	size = msgsize
 	i = 0
 	#for i in range(60 - size):
@@ -43,19 +48,18 @@ def attack():
 		sizeStr += '%' + partial
 	size += len(sizeStr) / 3
 	ourMessage = ourMessage + sizeStr
-	tag = hash('sup', '121dcea87e135cf769e22add789fba74ca40ad0d', size)
-	url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + '121dcea87e135cf769e22add789fba74ca40ad0d'
+	ourMessage = ourMessage + 'deal%20with%20it'
+	tag = hash('deal with it', '4388331c12958f7a92f63062ac1e94ea72de9663', size)
+	url = 'http://localhost:8080/?who=Costello&what=' + ourMessage + '&mac=' + tag
 	print("SIZE MESSAGE: " + str(msgsize))
 	print("SIZE OF EVERYTHING: " + str(size))
 	print("SIZE OF SIZE STRING: " + str(len(sizeStr) / 3))
 	print(url)
 	size += 1
-	#print(url)
-	#r = requests.get(url)
-	#if 'Invalid signature' in r.text:
-	#	print "we suck"
-	#else:
-	#	print "deal with it"
-	#	print url
+	r = requests.get(url)
+	if 'Invalid signature' in r.text:
+		print "we suck"
+	else:
+		print "deal with it"
 			
 attack()
