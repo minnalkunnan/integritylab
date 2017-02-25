@@ -22,6 +22,6 @@ Task 4 In HMAC-Timing directory
 
 	Unfortunately our implementation still ran into errors with variation in the time it took to verify a tag string. Increasing the sleep time between verifications to .02 allowed us to guess around 12 characters consistently correctly before the random variation disrupted our attack. We might be able to better improve our attack by running it on a non-personal machine with no background tasks running or in a virtual machine.
 
-	B. We could not correctly guess the entire string with a sleep of .02 or .01 but we consistently got 12 characters of the string correct. So we then tested with a sleep of .05 and got 
+	B. We could not correctly guess the entire string with a sleep of .02 or .01 but we consistently got 12 characters of the string correct. So we then tested with a sleep of .007 and got only 3 characters correct. Even with .008 we got around 12 characters so we determined the cutoff for our implementation guessing 12 characters correctly was .007
 	
 	C. Again, as with Part B, we could not correctly guess the entire string with a sleep of .02 or .01 but we consistently got 12 characters of the string correct. Therefore we came up with an algorithm to break our crack consistently at .01 seconds, where our crack would not even be able to predict the first character with over 1 / 256 chance of certainty. Instead of breaking on each character, we check every one before returning false, sleeping at each check.
